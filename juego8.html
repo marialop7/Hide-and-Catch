@@ -1,0 +1,221 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>Hide and Catch</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+    var config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+        physics: {
+            default: 'arcade',
+            arcade: {
+                gravity: { y: 0},
+                debug: false
+            }
+        },
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+        }
+    };
+
+    var player;
+    var platforms;
+    var cursors;
+
+    var game = new Phaser.Game(config);
+
+    function preload ()
+    {
+        this.load.image('fondo', 'assets/Ground_Tile_02_B.png');
+        this.load.image('parte1', 'assets/Decor_Tile_B_01.png');
+        this.load.image('parte2', 'assets/Decor_Tile_B_07.png');
+        this.load.image('parte3', 'assets/Decor_Tile_B_03.png');
+        this.load.image('parte4', 'assets/Decor_Tile_B_09.png');
+        this.load.image('esquina1', 'assets/Hedge_B_01.png');
+        this.load.image('esquina2', 'assets/Hedge_B_02.png');
+        this.load.image('esquina3', 'assets/Hedge_B_04.png');
+        this.load.image('esquina4', 'assets/Hedge_B_05.png');
+        this.load.image('esquina5', 'assets/Hedge_B_06.png');
+       this.load.image('esquina6', 'assets/Hedge_B_07.png');
+        this.load.image('A', 'assets/A.png');
+        this.load.image('B', 'assets/B.png');
+        this.load.image('tree1', 'assets/Tree_02.png');
+        this.load.image('tree2', 'assets/Tree_03.png');
+        this.load.image('roca1', 'assets/Rock_03.png');
+        this.load.image('roca2', 'assets/Rock_02.png');
+        this.load.image('roca2', 'assets/Rock_02.png');
+        this.load.image('bloque1', 'assets/Block_B_01.png');
+        this.load.image('bloque2', 'assets/Block_B_02.png');
+        this.load.image('tree3', 'assets/Tree_01.png');
+        this.load.image('barrera', 'assets/barra.png');
+        this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
+    }
+
+    function create ()
+    {
+        this.add.image(400, 300, 'fondo');
+        this.add.image(65, 225, 'parte1');
+        this.add.image(65, 350, 'parte2');
+        this.add.image(735, 225, 'parte3');
+        this.add.image(735, 350, 'parte4');
+        this.add.image(70, 290, 'A');
+        this.add.image(730, 290, 'B');
+        
+        platforms = this.physics.add.staticGroup();
+        
+        
+        platforms.create(75, 75, 'esquina1');
+        platforms.create(225, 5, 'esquina2');
+        platforms.create(510, 75, 'esquina1');
+        platforms.create(640, 4, 'esquina2');
+        platforms.create(350, 75, 'esquina3');
+        platforms.create(725, 75, 'esquina3');
+        platforms.create(350, 515, 'esquina4');
+        platforms.create(85, 510, 'esquina5');
+        platforms.create(215, 590, 'esquina6');
+        platforms.create(720, 510, 'esquina4');
+        platforms.create(525, 515, 'esquina5');
+        platforms.create(621, 580, 'esquina6');
+        platforms.create(430, 225, 'tree1');
+        platforms.create(430, 375, 'tree1');
+        platforms.create(315, 555, 'tree2');
+        platforms.create(520, 50, 'tree2');
+        platforms.create(300, 290, 'roca1');
+        platforms.create(540, 290, 'roca2');
+        platforms.create(60, 140, 'bloque1');
+        platforms.create(60, 435, 'bloque1');
+        platforms.create(150, 210, 'bloque2');
+        platforms.create(150, 370, 'bloque2');
+        platforms.create(130, 140, 'tree3');
+        platforms.create(130, 435, 'tree3');
+        platforms.create(740, 140, 'bloque1');
+        platforms.create(740, 435, 'bloque1');
+        platforms.create(650, 210, 'bloque2');
+        platforms.create(650, 370, 'bloque2');
+        platforms.create(680, 140, 'tree3');
+        platforms.create(680, 435, 'tree3');
+        platforms.create(230, 80, 'barrera');
+        platforms.create(620, 520, 'barrera');
+
+        player = this.physics.add.sprite(70, 280, 'dude');
+
+        player.setBounce(0.2);
+        player.setCollideWorldBounds(true);
+
+        this.anims.create({
+            key: 'left',
+            frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
+            frameRate: 10,
+            repeat: -1
+        });
+        
+        this.anims.create({
+            key: 'up',
+            frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
+            frameRate: 10,
+            repeat: -1
+        });
+        
+        this.anims.create({
+            key: 'down',
+            frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
+            frameRate: 10,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'turn',
+            frames: [ { key: 'dude', frame: 4 } ],
+            frameRate: 20
+        });
+
+        this.anims.create({
+            key: 'right',
+            frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
+            frameRate: 10,
+            repeat: -1
+        });
+
+        cursors = this.input.keyboard.createCursorKeys();
+
+        stars = this.physics.add.group({
+            key: 'star',
+            repeat: 0,
+            setXY: { x: 10000002, y: 7000000, stepX: 7000000 }
+        });
+
+        stars.children.iterate(function (child) {
+
+            child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+
+        });
+
+        this.physics.add.collider(player, platforms);
+        this.physics.add.collider(stars, platforms);
+
+        this.physics.add.overlap(player, stars, collectStar, null, this);
+    }
+
+    function update ()
+    {
+        if (cursors.left.isDown)
+        {
+            player.setVelocityX(-160);
+
+            player.anims.play('left', true);
+        }
+        
+        else if (cursors.up.isDown)
+        {
+            player.setVelocityY(-160);
+
+            player.anims.play('up', true);
+        }
+        
+        else if (cursors.down.isDown)
+        {
+            player.setVelocityY(160);
+
+            player.anims.play('down', true);
+        }
+        
+        else if (cursors.right.isDown)
+        {
+            player.setVelocityX(160);
+
+            player.anims.play('right', true);
+        }
+        else
+        {
+            player.setVelocityX(0);
+            player.setVelocityY(0);
+
+            player.anims.play('turn');
+        }
+
+        
+    }
+
+    function collectStar (player, star)
+    {
+        star.disableBody(true, true);
+    }
+
+</script>
+
+</body>
+</html>
